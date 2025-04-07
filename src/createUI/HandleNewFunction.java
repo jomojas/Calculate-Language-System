@@ -1,26 +1,25 @@
 package createUI;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import main.Main;
+import MyException.MyException;
+import java.io.*;
 import javax.swing.*;
 
 public class HandleNewFunction {
-  	private JTextArea codeArea;
-    private JTextArea outputArea;
+    private CreateUI ui = null;
 
     // Constructor to initialize the JTextArea objects
-    public HandleNewFunction(JTextArea codeArea, JTextArea outputArea) {
-        this.codeArea = codeArea;
-        this.outputArea = outputArea;
+    public HandleNewFunction() {
+        this.ui = Main.ui;
     }
 
     // Method to handle the "New" button click operation
-    public void execute(File currentFile, boolean hasChanged) {
+    public void execute() {
     	try {
-    	    if (currentFile == null) { // First-time save (Save As)
+    		if (ui.codeArea.getText().trim().isEmpty()) {
+				return;
+			}
+    	    if (ui.currentFile == null) { // First-time save (Save As)
     	        JFileChooser fileChooser = new JFileChooser();
     	        fileChooser.setDialogTitle("Save As");
     	        fileChooser.setSelectedFile(new File("Untitled.txt")); // Default filename
@@ -50,27 +49,33 @@ public class HandleNewFunction {
     	            }
     	            
     	            // Save the file
-    	            saveFile(fileToSave, codeArea.getText());
-    	            currentFile = fileToSave; // Update currentFile after saving
+    	            saveFile(fileToSave, ui.codeArea.getText());
+    	            ui.currentFile = fileToSave; // Update currentFile after saving
     	        }
     	    } else { // File already exists (Save, not Save As)
-    	        saveFile(currentFile, codeArea.getText());
+    	        saveFile(ui.currentFile, ui.codeArea.getText());
     	    }
-    	} catch (IOException ex) {
+    	} catch (MyException ex) {
     	    JOptionPane.showMessageDialog(
     	        null, 
     	        "Error saving file: " + ex.getMessage(), 
     	        "Error", 
     	        JOptionPane.ERROR_MESSAGE
     	    );
+    	} finally {
+    		// Clear the content of codeArea and outputArea
+    		ui.codeArea.setText("");
+    		ui.outputArea.setText("");
     	}
     }
 
 	// Helper method to save file content
-	private void saveFile(File file, String content) throws IOException {
+	private void saveFile(File file, String content) throws MyException {
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 	        writer.write(content);
 	        JOptionPane.showMessageDialog(null, "File saved successfully!");
+	    } catch (IOException ex) {
+	    	throw new MyException("Error Saving file");
 	    }
 	}
 }
