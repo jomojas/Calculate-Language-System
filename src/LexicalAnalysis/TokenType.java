@@ -1,18 +1,18 @@
 package LexicalAnalysis;
 
 public enum TokenType {
-	INT, 
-	FLOAT, 
-	BOOL,
-	STRING,
-	PLUS, 
-	MINUS, 
-	MUL, 
-	DIV,
-	EXP,
-	AND,
-	OR,
-	NOT,
+	INT, // 12
+	FLOAT, //12.3
+	BOOL,	// true false
+	STRING,	// "hello"
+	PLUS, // +
+	MINUS, // -
+	MUL, // *
+	DIV,	// /
+	EXP,	// ^
+	AND,	// &
+	OR,	// |
+	NOT,	// !
 	LPAREN,	// (
 	RPAREN,	// )
 	LCB,	// {
@@ -33,4 +33,5 @@ public enum TokenType {
 	TAN,
 	ID,
 	KW,	// int, float, bool, string
+	EOF, // The end of file
 }

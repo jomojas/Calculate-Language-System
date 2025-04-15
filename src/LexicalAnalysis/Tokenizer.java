@@ -1,6 +1,8 @@
 package LexicalAnalysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import MyException.MyException;
 
 public class Tokenizer {
@@ -14,6 +16,7 @@ public class Tokenizer {
 		this.codeString = code;
 		getLines();
 		getTokens();
+		tokens.add(new Token(TokenType.EOF, -1, -1));	// Add the end of file to tokens
 	}
 	
 	public ArrayList<Token> handOnTokens() {
@@ -22,27 +25,8 @@ public class Tokenizer {
 	
 	// Divide code to separate lines
 	public void getLines() {
-		boolean insideString = false;
-		StringBuffer line  = new StringBuffer();
-		for (int i = 0; i < codeString.length(); i++) {
-			// Set insideString to true when enter a string
-			if (codeString.charAt(i) == '"' && codeString.charAt(i - 1) != '\\') {
-				insideString = !insideString; // Flip insideString
-			}
-			// Meet '\n' outside string, add current line to ArrayList<String>
-			if (insideString == false && codeString.charAt(i) == '\n') {
-				lines.add(line.toString());
-				line.setLength(0);
-				continue;
-			}
-			line.append(codeString.charAt(i));
-			// If current index is the last character of codeString, add the last line to lines
-			if (i == codeString.length() - 1) {
-				lines.add(line.toString());
-				line.setLength(0);
-				break;
-			}
-		}
+		String[] stringLines = codeString.split("\\R");
+		lines = new ArrayList<>(Arrays.asList(stringLines));
 	}
 	
 	// Divide lines to separate tokens
@@ -115,7 +99,7 @@ public class Tokenizer {
 //	                case '=': tokens.add(new Token(TokenType.ASSIGN, "=")); break;
 //	                case '#': tokens.add(new Token(TokenType.DF, "#")); break;
 	                default:
-	                    throw new RuntimeException("Unexpected character: " + current);
+	                    throw new MyException("Row:" + rowIndex + "	Col:" +	(col + 1) + "Unexpected character: " + current);
 	            }
 	            pos++; // Move to next character
 	            col++;
