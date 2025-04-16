@@ -31,6 +31,11 @@ public class CreateUI {
         outputArea = new JTextArea(10, 60);
         outputArea.setEditable(false);
         
+        // Add line numbers
+        JScrollPane scrollPane = new JScrollPane(codeArea);
+        TextLineNumber lineNumber = new TextLineNumber(codeArea);
+        scrollPane.setRowHeaderView(lineNumber);
+        
         // Monitor the change in codeArea
         codeArea.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { hasChanged = true; }
@@ -39,7 +44,7 @@ public class CreateUI {
         });
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                new JScrollPane(codeArea), new JScrollPane(outputArea));
+                scrollPane, new JScrollPane(outputArea));
         splitPane.setResizeWeight(0.7); // 70% for code, 30% for output
         frame.add(splitPane, BorderLayout.CENTER);
 

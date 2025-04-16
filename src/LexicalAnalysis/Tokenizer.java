@@ -119,7 +119,7 @@ public class Tokenizer {
 
 	        if (currentChar == '.') {
 	            if (isFloat) {
-	                throw new MyException("Row:" + rowIndex + " Col:" + (col + 1) + "	Invalid number format: multiple decimal points in '" + number + "'");
+	                throw new MyException("Row:" + rowIndex + "\tCol:" + (col + 1) + "\tInvalid number format: multiple decimal points in '" + number + "'");
 	            }
 	            isFloat = true;
 	        } else {
@@ -138,7 +138,7 @@ public class Tokenizer {
 
 	    // If no digit was found (e.g., just a dot), it's invalid
 	    if (!hasDigit) {
-	        throw new MyException("Row:" + rowIndex + "	Col:" + (col + 1) + "	Invalid number format: missing digits in '" + number + "'");
+	        throw new MyException("Row:" + rowIndex + "\tCol:" + (col + 1) + "\tInvalid number format: missing digits in '" + number + "'");
 	    }
 
 	    // Determine the token type
@@ -163,7 +163,7 @@ public class Tokenizer {
 	        }
 	        // If it's an invalid character in an identifier, throw an error
 	        else {
-	            throw new MyException("Row:" + rowIndex + " Col:" + (col + 1) + " — Unexpected character '" + c + "' in identifier");
+	            throw new MyException("Row:" + rowIndex + "\tCol:" + (col + 1) + "\tUnexpected character '" + c + "' in identifier");
 	        }
 	    }
 
@@ -227,7 +227,7 @@ public class Tokenizer {
 	            pos++; // Move to escaped character
 	            col++;
 	            if (pos >= currentLine.length()) {
-	                throw new MyException("Row:" + rowIndex + "	Col:" +	(col + 1) + "	Unexpected end of input after escape character");
+	                throw new MyException("Row:" + rowIndex + "\tCol:" +	(col + 1) + "\tUnexpected end of input after escape character");
 	            }
 
 	            char escapedChar = currentLine.charAt(pos);
