@@ -10,6 +10,7 @@ public enum TokenType {
 	MUL, // *
 	DIV,	// /
 	EXP,	// ^
+	MODULAR, // %
 	AND,	// &
 	OR,	// |
 	NOT,	// !

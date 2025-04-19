@@ -84,13 +84,14 @@ public class Tokenizer {
 	            
 	            // Handle single-character tokens
 	            switch (current) {
-	                case '+': tokens.add(new Token(TokenType.PLUS, rowIndex, col + 1)); break;
-	                case '-': tokens.add(new Token(TokenType.MINUS, rowIndex, col + 1)); break;
+	                case '+': tokens.add(new Token(TokenType.PLUS, rowIndex, col + 1, "+")); break;
+	                case '-': tokens.add(new Token(TokenType.MINUS, rowIndex, col + 1, "-")); break;
 	                case '*': tokens.add(new Token(TokenType.MUL, rowIndex, col + 1)); break;
 //	                case '/': tokens.add(new Token(TokenType.DIV, "/")); break;
 	                case '^': tokens.add(new Token(TokenType.EXP, rowIndex, col + 1)); break;
-	                case '&': tokens.add(new Token(TokenType.AND, rowIndex, col + 1)); break;
-	                case '|': tokens.add(new Token(TokenType.OR, rowIndex, col + 1)); break;
+	                case '%': tokens.add(new Token(TokenType.MODULAR, rowIndex, col + 1)); break;	                
+	                case '&': tokens.add(new Token(TokenType.AND, rowIndex, col + 1, "&")); break;
+	                case '|': tokens.add(new Token(TokenType.OR, rowIndex, col + 1, "|")); break;
 	                case '!': tokens.add(new Token(TokenType.NOT, rowIndex, col + 1)); break;
 	                case '(': tokens.add(new Token(TokenType.LPAREN, rowIndex, col + 1)); break;
 	                case ')': tokens.add(new Token(TokenType.RPAREN, rowIndex, col + 1)); break;
