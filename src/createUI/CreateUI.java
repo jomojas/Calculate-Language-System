@@ -26,16 +26,48 @@ public class CreateUI {
         }
         frame.add(buttonPanel, BorderLayout.NORTH);
 
+//        // Text Areas
+//        codeArea = new JTextArea(15, 60);
+//        outputArea = new JTextArea(10, 60);
+//        outputArea.setEditable(false);
+//        
+//        // Add line numbers
+//        JScrollPane scrollPane = new JScrollPane(codeArea);
+//        TextLineNumber lineNumber = new TextLineNumber(codeArea);
+//        scrollPane.setRowHeaderView(lineNumber);
+//        
+//        // Monitor the change in codeArea
+//        codeArea.getDocument().addDocumentListener(new DocumentListener() {
+//            public void insertUpdate(DocumentEvent e) { hasChanged = true; }
+//            public void removeUpdate(DocumentEvent e) { hasChanged = true; }
+//            public void changedUpdate(DocumentEvent e) { hasChanged = true; }
+//        });
+//
+//        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+//                scrollPane, new JScrollPane(outputArea));
+//        splitPane.setResizeWeight(0.7); // 70% for code, 30% for output
+//        frame.add(splitPane, BorderLayout.CENTER);
+//
+//        frame.setVisible(true);
         // Text Areas
         codeArea = new JTextArea(15, 60);
-        outputArea = new JTextArea(10, 60);
+        outputArea = new JTextArea(10, 50);
         outputArea.setEditable(false);
-        
-        // Add line numbers
-        JScrollPane scrollPane = new JScrollPane(codeArea);
+
+        // Disable line wrapping for outputArea
+        outputArea.setLineWrap(false);  // Disable wrapping
+        outputArea.setWrapStyleWord(false);  // Disable word wrapping
+
+        // Add line numbers to codeArea
+        JScrollPane codeScrollPane = new JScrollPane(codeArea);
         TextLineNumber lineNumber = new TextLineNumber(codeArea);
-        scrollPane.setRowHeaderView(lineNumber);
-        
+        codeScrollPane.setRowHeaderView(lineNumber);
+
+        // Add horizontal scrolling for outputArea
+        JScrollPane outputScrollPane = new JScrollPane(outputArea);
+        outputScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  // Always show horizontal scrollbar
+        outputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);    // Show vertical scrollbar if needed
+
         // Monitor the change in codeArea
         codeArea.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { hasChanged = true; }
@@ -43,12 +75,16 @@ public class CreateUI {
             public void changedUpdate(DocumentEvent e) { hasChanged = true; }
         });
 
+        // Split pane to display both codeArea and outputArea
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                scrollPane, new JScrollPane(outputArea));
+                codeScrollPane, outputScrollPane);
         splitPane.setResizeWeight(0.7); // 70% for code, 30% for output
+
+        // Add the split pane to the frame
         frame.add(splitPane, BorderLayout.CENTER);
 
         frame.setVisible(true);
+
     }
 
     private void handleButtonClick(String command) {

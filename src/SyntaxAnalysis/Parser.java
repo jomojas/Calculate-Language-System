@@ -151,20 +151,6 @@ public class Parser {
 		return new PrintNode(expression);
 	}
 	
-//	public SyntaxNode parseReadnum() throws MyException {
-//		advanceToken();				// Move past READNUM
-//		
-//		expect(TokenType.LPAREN);	// Expect '(' after READNUM
-//		advanceToken();				// Move past '('
-//		
-//		SyntaxNode expression = parseArithOrStringOrBoolExpr();
-//		
-//		expect(TokenType.RPAREN);	// Expect ')' after expression 
-//		advanceToken();
-//		
-//		return new ReadnumNode(expression);
-//	}
-	
 	public SyntaxNode parseSin() throws MyException {
 		advanceToken();				// Move past SIN
 		
@@ -313,6 +299,13 @@ public class Parser {
 	        advanceToken();  // Move past AND
 	        SyntaxNode rightTerm = parseTermB();  // Parse the right-hand side
 	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
+	        
+//	     // Check the types of the operands to determine if it's a mathematical addition or string concatenation
+//	        if (term instanceof StringNode || rightTerm instanceof StringNode) {
+//	            term = new ConcatenateNode(term, rightTerm);  // String concatenation
+//	        } else {
+//	            term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Arithmetic addition/subtraction
+//	        }
 	    }
 	
 	    return term;

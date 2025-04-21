@@ -57,7 +57,8 @@ public class HandleRunFunction {
 //	}
 	
 	public void displaySyntaxTree(String SyntaxTree) {
-		ui.outputArea.setText(SyntaxTree);
+//		ui.outputArea.setText(SyntaxTree);
+		System.out.println(SyntaxTree);
 	}
 }
 
