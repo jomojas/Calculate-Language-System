@@ -69,6 +69,8 @@ public class Parser {
 	            return parseIf();
 	        case PRINT:
 	            return parsePrint();
+//	        case READNUM:
+//	        	return parseReadnum();
 	        case SIN:
 	            return parseSin();
 	        case COS:
@@ -148,6 +150,20 @@ public class Parser {
 		
 		return new PrintNode(expression);
 	}
+	
+//	public SyntaxNode parseReadnum() throws MyException {
+//		advanceToken();				// Move past READNUM
+//		
+//		expect(TokenType.LPAREN);	// Expect '(' after READNUM
+//		advanceToken();				// Move past '('
+//		
+//		SyntaxNode expression = parseArithOrStringOrBoolExpr();
+//		
+//		expect(TokenType.RPAREN);	// Expect ')' after expression 
+//		advanceToken();
+//		
+//		return new ReadnumNode(expression);
+//	}
 	
 	public SyntaxNode parseSin() throws MyException {
 		advanceToken();				// Move past SIN
@@ -368,18 +384,24 @@ public class Parser {
 	
 	/* atom -> INT | FLOAT | STRING | BOOL
          	-> (PLUS | MINUS | NOT)atom
-         	-> LPAREN arithOrStingOrBoolExpr RPAREN */
+         	-> LPAREN arithOrStingOrBoolExpr RPAREN
+         	-> ID
+         	-> READNUM LPAREN RPAREN */
 	public SyntaxNode parseAtom() throws MyException {
 		Token token = currentToken();
 		
 		// atom -> INT | FLOAT | STRING | BOOL
 		if (token.getType() == TokenType.INT) {
+			advanceToken();	// Move past INT token
 			return new NumberNode(Integer.parseInt(token.getValue()));
 		} else if (token.getType() == TokenType.FLOAT) {
+			advanceToken();	// Move past FLOAT token
 			return new NumberNode(Float.parseFloat(token.getValue()));
 		} else if (token.getType() == TokenType.STRING) {
+			advanceToken();	// Move past STRING token
 			return new StringNode(token.getValue());
 		} else if (token.getType() == TokenType.BOOL) {
+			advanceToken();	// Move past BOOL token
 			return new BoolNode(Boolean.parseBoolean(token.getValue()));
 		}
 		
@@ -399,6 +421,22 @@ public class Parser {
 	        advanceToken();  // Move past ')'
 	        return expr;
 	    }
+		
+		// atom -> ID
+		else if (token.getType() == TokenType.ID) {
+			advanceToken();	// Move past ID
+			return new VariableNode(token.getValue());
+		}
+		
+		// atom -> READNUM LPAREN RPAREN
+		else if (token.getType() == TokenType.READNUM) {
+			advanceToken();	// Move past READNUM
+			expect(TokenType.LPAREN);	// Expect '{' after READNUM
+			advanceToken();	// Move past '{'
+			expect(TokenType.RPAREN);	// Expect '}' after '{'
+			advanceToken();	// Move past '}'
+			return new ReadNumNode();
+		}
 		
 		// If none of the above, throw an exception
 	    throw new MyException("Invalid token: " + token.getType() + "\trow:" + token.getRow() + 
