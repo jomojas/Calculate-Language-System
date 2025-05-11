@@ -1,22 +1,38 @@
 package SyntaxAnalysis.SyntaxNode;
 
 public class NumberNode extends SyntaxNode{
-	private double value;
+	private double Fvalue;
+	private int Ivalue;
+	private boolean isInt;
 	
 	public NumberNode(double value) {
-	    this.value = value;
+	    this.Fvalue = value;
+	    this.isInt = false;
 	}
 	
-	public double getValue() {
-		return value;
+	public NumberNode(int value) {
+		this.Ivalue = value;
+		this.isInt = true;
+	}
+	
+	public double getFloatValue() {
+		return Fvalue;
+	}
+	
+	public int getIntValue() {
+		return Ivalue;
+	}
+	
+	public boolean isInt() {
+		return isInt;
 	}
 	
 	@Override
 	public String toString(String indent) {
-	    // If value is an integer, display it without a decimal point
-	    if (value == (int) value) {
-	        return indent + "NumberNode: " + (int) value + "\n"; // Casting to int for integer output
+	    if(isInt) {
+	    	return indent + "NumberNode: " + Ivalue + "\n"; 
+	    } else {
+	    	return indent + "NumberNode: " + Fvalue + "\n";
 	    }
-	    return indent + "NumberNode: " + value + "\n";
 	}
 }

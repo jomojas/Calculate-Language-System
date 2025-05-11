@@ -2,9 +2,9 @@ package SyntaxAnalysis.SyntaxNode;
 
 public class WhileNode extends SyntaxNode{
 	public SyntaxNode condition;	// arithOrStringOrBoolExpr
-	public SyntaxNode body;			// block (exprList)
+	public ExprListNode body;			// block (exprList)
 	
-	public WhileNode(SyntaxNode condition, SyntaxNode body) {
+	public WhileNode(SyntaxNode condition, ExprListNode body) {
 		this.condition = condition;
 		this.body = body;
 	}

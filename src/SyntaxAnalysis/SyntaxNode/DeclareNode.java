@@ -15,6 +15,10 @@ public class DeclareNode extends SyntaxNode{
         children.add(node);
     }
 
+    public String getType() {
+    	return type;
+    }
+    
     @Override
     public String toString(String indent) {
     	StringBuilder sb = new StringBuilder();

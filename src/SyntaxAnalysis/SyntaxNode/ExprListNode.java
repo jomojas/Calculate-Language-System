@@ -14,6 +14,10 @@ public class ExprListNode extends SyntaxNode{
 	    expressions.add(expr);
 	}
 	
+	public List<SyntaxNode> getExprList() {
+		return expressions;
+	}
+	
 	@Override
 	public String toString(String indent) {
 	    StringBuilder sb = new StringBuilder();

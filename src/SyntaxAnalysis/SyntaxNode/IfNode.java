@@ -2,15 +2,15 @@ package SyntaxAnalysis.SyntaxNode;
 
 public class IfNode extends SyntaxNode{
 	public SyntaxNode condition;	// arithOrStringOrBoolExpr
-	public SyntaxNode thenBlock;	// block -> exprList 
-	public SyntaxNode elseBlock;	// block -> exprList (can be null)
+	public ExprListNode thenBlock;	// block -> exprList 
+	public ExprListNode elseBlock;	// block -> exprList (can be null)
 	
-	public IfNode(SyntaxNode condition, SyntaxNode thenBlock, SyntaxNode elseBlock) {
+	public IfNode(SyntaxNode condition, ExprListNode thenBlock, ExprListNode elseBlock) {
 		this(condition, thenBlock);
 		this.elseBlock = elseBlock;
 	}
 	
-	public IfNode(SyntaxNode condition, SyntaxNode thenBlock) {
+	public IfNode(SyntaxNode condition, ExprListNode thenBlock) {
 		this.condition = condition;
 		this.thenBlock = thenBlock;
 	}

@@ -17,9 +17,10 @@ public class Parser {
 //		rootNode.toString("");
 	}
 	
-	public String returnSyntaxTree() throws MyException {
-		SyntaxNode rootNode = parseProgram();
-		return rootNode.toString("");
+	public ProgramNode returnSyntaxTree() throws MyException {
+		ProgramNode rootNode = parseProgram();
+		return rootNode;
+//		return rootNode.toString("");
 	}
 	
 	public Token currentToken() {
@@ -47,7 +48,7 @@ public class Parser {
 
 	
 	// Return a programNode which is also the root of syntax tree
-	public SyntaxNode parseProgram() throws MyException {
+	public ProgramNode parseProgram() throws MyException {
 		ProgramNode pn = new ProgramNode();
 		
 		while (currentToken().getType() != TokenType.EOF) {
@@ -91,7 +92,7 @@ public class Parser {
 	        case RETURN:
 	            return parseReturn();
 	        case ID:
-	            return parseAssign();  // New method: can be assign or expression
+	            return parseAssign(false);  // New method: can be assign or expression
 	        default:
 	            throw new MyException("Unexpected token: " + token + "\trow:" + token.getRow() + 
 	            		"\tcol:" + token.getCol());
@@ -109,7 +110,7 @@ public class Parser {
 		expect(TokenType.RPAREN); 	// Expect ')' after condition
 		advanceToken();				// Move past ')'
 		
-		SyntaxNode body = parseBlock();	
+		ExprListNode body = parseBlock();	
 		
 		return new WhileNode(condition, body);
 	}
@@ -125,12 +126,12 @@ public class Parser {
 		expect(TokenType.RPAREN);	// Expect ')' after condition
 		advanceToken();				// Move past ')'
 		
-		SyntaxNode thenBlock = parseBlock();
+		ExprListNode thenBlock = parseBlock();
 		
 		// has else sentence
 		if (currentToken().getType() == TokenType.ELSE) {
 			advanceToken();		// Move past ELSE
-			SyntaxNode elseBlock = parseBlock();
+			ExprListNode elseBlock = parseBlock();
 			return new IfNode(condition, thenBlock, elseBlock);
 		}
 		
@@ -207,7 +208,7 @@ public class Parser {
 				
 				// Assign
 				if (nextToken.getType() == TokenType.ASSIGN) {
-					dn.add(parseAssign());	// handles Assign
+					dn.add(parseAssign(true));	// handles Assign
 				} else {
 					dn.add(new VariableNode(token.getValue()));
 					advanceToken();	// Move past ID
@@ -240,7 +241,7 @@ public class Parser {
 		return new ReturnNode(expression);
 	}
 	
-	public SyntaxNode parseAssign() throws MyException {
+	public SyntaxNode parseAssign(boolean isDeclaration) throws MyException {
 		Token token = currentToken();	// token type is ID
 		advanceToken();	// Move past ID to Assign
 		
@@ -253,10 +254,10 @@ public class Parser {
 		
 		SyntaxNode expression = parseArithOrStringOrBoolExpr();
 		
-		return new AssignNode(token.getValue(), expression);
+		return new AssignNode(token.getValue(), expression, isDeclaration);
 	}
 	
-	public SyntaxNode parseBlock() throws MyException {
+	public ExprListNode parseBlock() throws MyException {
 		expect(TokenType.LCB);	// Expect '{' at the beginning of block
 		advanceToken();
 		
