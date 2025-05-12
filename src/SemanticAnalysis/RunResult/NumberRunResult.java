@@ -41,7 +41,7 @@ public class NumberRunResult extends RunResult {
 	 * int + float -> float
 	 * float + float -> float
 	 */
-	public NumberRunResult add(RunResult other) throws MyException {
+	public RunResult add(RunResult other) throws MyException {
 		if(other instanceof NumberRunResult numRes) {
 			if(this.isInt && numRes.isInt) {
 				long result = (long)intV + (long)numRes.intV;
@@ -51,6 +51,8 @@ public class NumberRunResult extends RunResult {
 				return new NumberRunResult((int)result, 0.0, true);
 			}
 			return new NumberRunResult(0, this.getFloatValue() + numRes.getFloatValue(), false);
+		} else if(other instanceof StringRunResult strRes) {
+			return new StringRunResult(this.toString() + strRes.value);
 		}
 		throw new MyException("Unsupported Type For Number Addition: " + other.getResultType());
 	}

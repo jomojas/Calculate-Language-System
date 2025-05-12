@@ -395,6 +395,18 @@ public class Interpret {
 				} else {
 					return new BoolRunResult(false);
 				}
+			} else if(left instanceof StringRunResult strRes1 && right instanceof StringRunResult strRes2) { 
+				if(strRes1.value.equals(strRes2.value)) {
+					return new BoolRunResult(true);
+				} else {
+					return new BoolRunResult(false);
+				}
+			} else if(left instanceof BoolRunResult boolRes1 && right instanceof BoolRunResult boolRes2) {
+				if(boolRes1.value == boolRes2.value) {
+					return new BoolRunResult(true);
+				} else {
+					return new BoolRunResult(false);
+				}
 			} else {
 				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
 			}
