@@ -8,7 +8,7 @@ import MyException.MyException;
 import SemanticAnalysis.Exception.*;
 import SemanticAnalysis.RunResult.*;
 import SyntaxAnalysis.SyntaxNode.*;
-import SemanticAnalysis.VariableType;
+//import SemanticAnalysis.VariableType;
 
 public class Interpret {
 //	private Map<String, VariableType> varTypeContainer = new HashMap<>();
@@ -71,22 +71,59 @@ public class Interpret {
 			throw new BreakException(node);
 		} else if(node instanceof ContinueNode) {
 			throw new ContinueException(node);
+		} else if(node instanceof ReadIntNode readIntNode) {
+			return processReadIntNode(readIntNode);
+		} else if(node instanceof ReadFloatNode readFloatNode) {
+			return processReadFloatNode(readFloatNode);
 		} else {
 			throw new MyException("Unknown Node Type");
 		}
 	}
 	
+	public NumberRunResult processReadIntNode(ReadIntNode node) {
+		ReadIntWindow readWindow = new ReadIntWindow();
+		int value = readWindow.getValue();
+		return new NumberRunResult(value, 0.0, true);
+	}
+	
+	public NumberRunResult processReadFloatNode(ReadFloatNode node) {
+		ReadFloatWindow readWindow = new ReadFloatWindow();
+		double value = readWindow.getValue();
+		return new NumberRunResult(0, value, false);
+	}
+	
 	public RunResult processAssignNode(AssignNode node) throws MyException {
 		if(node.isDeclaration) {
 			RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-			varStack.peek().put(node.variableName, expression);
+			if(varTypeStack.peek().get(node.variableName) == VariableType.STRING && expression instanceof StringRunResult) {				
+				varStack.peek().put(node.variableName, expression);
+			} else if(varTypeStack.peek().get(node.variableName) == VariableType.BOOL && expression instanceof BoolRunResult) {
+				varStack.peek().put(node.variableName, expression);
+			} else if(varTypeStack.peek().get(node.variableName) == VariableType.INT && expression instanceof NumberRunResult numRes && numRes.isInt) {
+				varStack.peek().put(node.variableName, expression);
+			} else if(varTypeStack.peek().get(node.variableName) == VariableType.FLOAT && expression instanceof NumberRunResult numRes && !numRes.isInt) {
+				varStack.peek().put(node.variableName, expression);
+			} else {
+				throw new MyException("Mismatched Type: " + expression.getResultType());
+			}
 		} else {
-			Map<String, RunResult> targetScope = findVariableScope(node.variableName);
-			if(targetScope == null) {
+			Map<String, RunResult> targetVarScope = findVariableScope(node.variableName);
+			if(targetVarScope == null) {
 				throw new MyException("Undefined variable: " + node.variableName);
 			}
 			RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-			targetScope.put(node.variableName, expression);
+			Map<String, VariableType> targetTypeScope = findVariableTypeScope(node.variableName);
+			if(targetTypeScope.get(node.variableName) == VariableType.STRING && expression instanceof StringRunResult) {				
+				targetVarScope.put(node.variableName, expression);
+			} else if(targetTypeScope.get(node.variableName) == VariableType.BOOL && expression instanceof BoolRunResult) {
+				targetVarScope.put(node.variableName, expression);
+			} else if(targetTypeScope.get(node.variableName) == VariableType.INT && expression instanceof NumberRunResult numRes && numRes.isInt) {
+				targetVarScope.put(node.variableName, expression);
+			} else if(targetTypeScope.get(node.variableName) == VariableType.FLOAT && expression instanceof NumberRunResult numRes && !numRes.isInt) {
+				targetVarScope.put(node.variableName, expression);
+			} else {
+				throw new MyException("Mismatched Type: " + expression.getResultType());
+			}
 		}
 		return new VoidRunResult();
 	}
@@ -183,7 +220,7 @@ public class Interpret {
 		// IF Block
 		if(boolRes.value) {
 			processExprListNode(node.thenBlock);
-		} else { // Then Block
+		} else if(node.elseBlock != null) { // Then Block
 			processExprListNode(node.elseBlock);
 		}
 		exitScope();
@@ -282,6 +319,31 @@ public class Interpret {
 			return new StringRunResult(sNode.getValue());
 		} else if(node instanceof BoolNode bNode) {
 			return new BoolRunResult(bNode.getValue());
+		} else if(node instanceof SinNode sinNode) {
+			RunResult expression = processArithOrStringOrBoolExpr(sinNode.expression);
+			if(expression instanceof NumberRunResult numRes) {
+				return numRes.sin();
+			} else {
+				throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType());
+			}
+		} else if(node instanceof CosNode cosNode) {
+			RunResult expression = processArithOrStringOrBoolExpr(cosNode.expression);
+			if(expression instanceof NumberRunResult numRes) {
+				return numRes.cos();
+			} else {
+				throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType());
+			}
+		} else if(node instanceof TanNode tanNode) {
+			RunResult expression = processArithOrStringOrBoolExpr(tanNode.expression);
+			if(expression instanceof NumberRunResult numRes) {
+				return numRes.tan();
+			} else {
+				throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType());
+			}
+		} else if(node instanceof ReadIntNode readIntNode) {
+			return processReadIntNode(readIntNode);
+		} else if(node instanceof ReadFloatNode readFloatNode) {
+			return processReadFloatNode(readFloatNode);
 		}
 		return null;
 	}
@@ -463,6 +525,15 @@ public class Interpret {
 	        }
 	    }
 	    return null;
+	}
+	
+	public Map<String, VariableType> findVariableTypeScope(String varName) {
+		for(int i = varTypeStack.size() - 1; i >= 0; i--) {
+			if(varStack.get(i).containsKey(varName)) {
+				return varTypeStack.get(i);
+			}
+		}
+		return null;
 	}
 }
 

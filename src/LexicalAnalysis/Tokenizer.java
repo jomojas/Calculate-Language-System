@@ -92,7 +92,7 @@ public class Tokenizer {
 	                case '%': tokens.add(new Token(TokenType.MODULAR, rowIndex, col + 1, "%")); break;	                
 	                case '&': tokens.add(new Token(TokenType.AND, rowIndex, col + 1, "&")); break;
 	                case '|': tokens.add(new Token(TokenType.OR, rowIndex, col + 1, "|")); break;
-	                case '!': tokens.add(new Token(TokenType.NOT, rowIndex, col + 1, "!")); break;
+//	                case '!': tokens.add(new Token(TokenType.NOT, rowIndex, col + 1, "!")); break;
 	                case '(': tokens.add(new Token(TokenType.LPAREN, rowIndex, col + 1)); break;
 	                case ')': tokens.add(new Token(TokenType.RPAREN, rowIndex, col + 1)); break;
 	                case '{': tokens.add(new Token(TokenType.LCB, rowIndex, col + 1)); break;
@@ -159,7 +159,7 @@ public class Tokenizer {
 	            col++;
 	        }
 	        // If it's a character that can legally end an identifier (whitespace, operator, etc.), stop scanning
-	        else if (Character.isWhitespace(c) || "(){}[],;:+-*/%&|=!<>".indexOf(c) != -1) {
+	        else if (Character.isWhitespace(c) || "(){}[],;:+-*/%&|=!<>^".indexOf(c) != -1) {
 	            break;
 	        }
 	        // If it's an invalid character in an identifier, throw an error
@@ -182,7 +182,8 @@ public class Tokenizer {
             case "back": return new Token(TokenType.BACK, rowIndex, col);
             case "continue": return new Token(TokenType.CONTINUE, rowIndex, col);
             case "print": return new Token(TokenType.PRINT, rowIndex, col);
-            case "readNum": return new Token(TokenType.READNUM, rowIndex, col);
+            case "readInt": return new Token(TokenType.READINT, rowIndex, col);
+            case "readFloat": return new Token(TokenType.READFLOAT, rowIndex, col);
             case "sin": return new Token(TokenType.SIN, rowIndex, col);
             case "cos": return new Token(TokenType.COS, rowIndex, col);
             case "tan": return new Token(TokenType.TAN, rowIndex, col);
@@ -208,7 +209,11 @@ public class Tokenizer {
 
 		    // If it's a single '=', it must be an assignment token
 		    if (firstChar == '=') {
-		        return new Token(TokenType.ASSIGN, rowIndex, col + 1);
+		        return new Token(TokenType.ASSIGN, rowIndex, col + 1, "=");
+		    }
+		    
+		    if (firstChar == '!') {
+		    	return new Token(TokenType.NOT, rowIndex, col + 1, "!");
 		    }
 
 		    // Otherwise, return a single-character comparator (< or >)

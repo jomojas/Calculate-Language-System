@@ -70,8 +70,10 @@ public class Parser {
 	            return parseIf();
 	        case PRINT:
 	            return parsePrint();
-//	        case READNUM:
-//	        	return parseReadnum();
+	        case READINT:
+	        	return parseReadInt();
+	        case READFLOAT:
+	        	return parseReadFloat();
 	        case SIN:
 	            return parseSin();
 	        case COS:
@@ -97,6 +99,30 @@ public class Parser {
 	            throw new MyException("Unexpected token: " + token + "\trow:" + token.getRow() + 
 	            		"\tcol:" + token.getCol());
 		}
+	}
+	
+	public SyntaxNode parseReadInt() throws MyException {
+		advanceToken();	// Move past READNUM
+		
+		expect(TokenType.LPAREN); // Expect '(' after READNUM
+		advanceToken();
+		
+		expect(TokenType.RPAREN); // Expect ')' after READNUM
+		advanceToken();
+		
+		return new ReadIntNode();
+	}
+	
+	public SyntaxNode parseReadFloat() throws MyException {
+		advanceToken();	// Move past READNUM
+		
+		expect(TokenType.LPAREN); // Expect '(' after READNUM
+		advanceToken();
+		
+		expect(TokenType.RPAREN); // Expect ')' after READNUM
+		advanceToken();
+		
+		return new ReadFloatNode();
 	}
 	
 	public SyntaxNode parseWhile() throws MyException {
@@ -422,14 +448,39 @@ public class Parser {
 			return new VariableNode(token.getValue());
 		}
 		
-		// atom -> READNUM LPAREN RPAREN
-		else if (token.getType() == TokenType.READNUM) {
-			advanceToken();	// Move past READNUM
+		// atom -> READINT LPAREN RPAREN
+		else if (token.getType() == TokenType.READINT) {
+			advanceToken();	// Move past READINT
 			expect(TokenType.LPAREN);	// Expect '{' after READNUM
 			advanceToken();	// Move past '{'
 			expect(TokenType.RPAREN);	// Expect '}' after '{'
 			advanceToken();	// Move past '}'
-			return new ReadNumNode();
+			return new ReadIntNode();
+		}
+		
+		// atom -> READFLOAT LPAREN RPAREN
+		else if (token.getType() == TokenType.READFLOAT) {
+			advanceToken();	// Move past READFLOAT
+			expect(TokenType.LPAREN);	// Expect '{' after READNUM
+			advanceToken();	// Move past '{'
+			expect(TokenType.RPAREN);	// Expect '}' after '{'
+			advanceToken();	// Move past '}'
+			return new ReadFloatNode();
+		}
+		
+		// atom -> sin
+		else if (token.getType() == TokenType.SIN) {
+			return parseSin();
+		}
+		
+		// atom -> cos
+		else if (token.getType() == TokenType.COS) {
+			return parseCos();
+		}
+		
+		// atom -> tan
+		else if (token.getType() == TokenType.TAN) {
+			return parseTan();
 		}
 		
 		// If none of the above, throw an exception
