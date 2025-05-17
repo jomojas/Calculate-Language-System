@@ -2,9 +2,12 @@ package SyntaxAnalysis.SyntaxNode;
 
 public class TanNode extends SyntaxNode{
 	public SyntaxNode expression;  // The expression to be calculated
-
-    public TanNode(SyntaxNode expression) {
+	public int row, col; 	// position of expression
+	
+    public TanNode(SyntaxNode expression, int row, int col) {
         this.expression = expression;
+        this.row = row;
+        this.col = col;
     }
 
     @Override

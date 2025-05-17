@@ -9,6 +9,7 @@ import LexicalAnalysis.*;
 public class Parser {
 	private ArrayList<Token> tokens;
 	private int currentTokenIndex = 0;
+	private int row = 0, col = 0;
 	
 	public Parser(String codeString) throws MyException {
 		SeparateToken se = new SeparateToken(codeString);
@@ -131,6 +132,9 @@ public class Parser {
 		expect(TokenType.LPAREN);	// Expect '(' after WHILE
 		advanceToken();				// Move past '('
 		
+		row = currentToken().getRow();
+		col = currentToken().getCol();
+		
 		SyntaxNode condition = parseArithOrStringOrBoolExpr();
 		
 		expect(TokenType.RPAREN); 	// Expect ')' after condition
@@ -138,7 +142,7 @@ public class Parser {
 		
 		ExprListNode body = parseBlock();	
 		
-		return new WhileNode(condition, body);
+		return new WhileNode(condition, body, row, col);
 	}
 	
 	public SyntaxNode parseIf() throws MyException {
@@ -146,6 +150,9 @@ public class Parser {
 		
 		expect(TokenType.LPAREN);	// Expect '(' after IF
 		advanceToken();				// Move past '('
+		
+		row = currentToken().getRow();
+		col = currentToken().getCol();
 		
 		SyntaxNode condition = parseArithOrStringOrBoolExpr();
 		
@@ -158,10 +165,10 @@ public class Parser {
 		if (currentToken().getType() == TokenType.ELSE) {
 			advanceToken();		// Move past ELSE
 			ExprListNode elseBlock = parseBlock();
-			return new IfNode(condition, thenBlock, elseBlock);
+			return new IfNode(condition, thenBlock, elseBlock, row, col);
 		}
 		
-		return new IfNode(condition, thenBlock);
+		return new IfNode(condition, thenBlock, row, col);
 	}
 	
 	public SyntaxNode parsePrint() throws MyException {
@@ -184,12 +191,15 @@ public class Parser {
 		expect(TokenType.LPAREN); 	// Expect '(' after SIN
 		advanceToken();
 		
+		row = currentToken().getRow();
+		col = currentToken().getCol();
+		
 		SyntaxNode expression = parseArithOrStringOrBoolExpr();
 		
 		expect(TokenType.RPAREN);	// Expect ')' after expression
 		advanceToken();
 		
-		return new SinNode(expression);
+		return new SinNode(expression, row, col);
 	}
 	
 	public SyntaxNode parseCos() throws MyException {
@@ -198,12 +208,15 @@ public class Parser {
 		expect(TokenType.LPAREN); 	// Expect '(' after COS
 		advanceToken();
 		
+		row = currentToken().getRow();
+		col = currentToken().getCol();
+		
 		SyntaxNode expression = parseArithOrStringOrBoolExpr();
 		
 		expect(TokenType.RPAREN);	// Expect ')' after expression
 		advanceToken();
 		
-		return new CosNode(expression);
+		return new CosNode(expression, row, col);
 	}
 	
 	public SyntaxNode parseTan() throws MyException {
@@ -212,31 +225,38 @@ public class Parser {
 		expect(TokenType.LPAREN);	// Expect '(' after TAN
 		advanceToken();
 		
+		row = currentToken().getRow();
+		col = currentToken().getCol();
+		
 		SyntaxNode expression = parseArithOrStringOrBoolExpr();
 		
 		expect(TokenType.RPAREN); 	// Expect ')' after expression
 		advanceToken();
 		
-		return new TanNode(expression);
+		return new TanNode(expression, row, col);
 	}
 	
 	public SyntaxNode parseKW() throws MyException {
 		Token keyword = currentToken();
+		row = currentToken().getRow();
+		col = currentToken().getCol();
 		advanceToken();	// Move past keyword
 		
-		DeclareNode dn = new DeclareNode(keyword.getValue());
+		DeclareNode dn = new DeclareNode(keyword.getValue(), row, col);
 		
 		while (true) {
 			Token token = currentToken();
 			
 			if (token.getType() == TokenType.ID) {
 				Token nextToken = peekNextToken();	// Get the token after ID
+				row = currentToken().getRow();
+				col = currentToken().getCol();
 				
 				// Assign
 				if (nextToken.getType() == TokenType.ASSIGN) {
 					dn.add(parseAssign(true));	// handles Assign
 				} else {
-					dn.add(new VariableNode(token.getValue()));
+					dn.add(new VariableNode(token.getValue(), row, col));
 					advanceToken();	// Move past ID
 				}
 			} else {	// The token after Keyword must be ID
@@ -276,11 +296,13 @@ public class Parser {
 			throw new MyException("Unexpected token: " + currentToken().getType() + "\trow:" + 
 					currentToken().getRow() + "\tcol:" + currentToken().getCol());
 		}
+		row = currentToken().getRow();
+		col = currentToken().getCol();
 		advanceToken();	// Move past '='
 		
 		SyntaxNode expression = parseArithOrStringOrBoolExpr();
 		
-		return new AssignNode(token.getValue(), expression, isDeclaration);
+		return new AssignNode(token.getValue(), expression, isDeclaration, row, col);
 	}
 	
 	public ExprListNode parseBlock() throws MyException {
@@ -307,9 +329,11 @@ public class Parser {
 	    // Now handle OR between terms (termA OR termA)
 	    while (currentToken().getType() == TokenType.OR) {
 	        Token operator = currentToken();  // Capture the OR token
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past OR
 	        SyntaxNode rightTerm = parseTermA();  // Parse the right-hand side
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms
 	    }
 
 	    return term;
@@ -323,16 +347,11 @@ public class Parser {
 	    // Handle AND between terms (termB AND termB)
 	    while (currentToken().getType() == TokenType.AND) {
 	        Token operator = currentToken();  // Capture the AND token
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past AND
 	        SyntaxNode rightTerm = parseTermB();  // Parse the right-hand side
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
-	        
-//	     // Check the types of the operands to determine if it's a mathematical addition or string concatenation
-//	        if (term instanceof StringNode || rightTerm instanceof StringNode) {
-//	            term = new ConcatenateNode(term, rightTerm);  // String concatenation
-//	        } else {
-//	            term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Arithmetic addition/subtraction
-//	        }
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms
 	    }
 	
 	    return term;
@@ -346,9 +365,11 @@ public class Parser {
 	    // Handle comparisons (e.g., <, >, ==, !=)
 	    while (currentToken().getType() == TokenType.COMP) {
 	        Token operator = currentToken();  // Capture comparison operator
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past comparison operator
 	        SyntaxNode rightTerm = parseTermC();  // Parse the right-hand side
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms
 	    }
 
 	    return term;
@@ -362,9 +383,11 @@ public class Parser {
 	    // Handle addition/subtraction
 	    while (currentToken().getType() == TokenType.PLUS || currentToken().getType() == TokenType.MINUS) {
 	        Token operator = currentToken();  // Capture the addition or subtraction operator
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past the operator
 	        SyntaxNode rightTerm = parseTermD();  // Parse the right-hand side
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms
 	    }
 
 	    return term;
@@ -378,9 +401,11 @@ public class Parser {
 	    // Handle multiplication/division/modular
 	    while (currentToken().getType() == TokenType.MUL || currentToken().getType() == TokenType.DIV || currentToken().getType() == TokenType.MODULAR) {
 	        Token operator = currentToken();  // Capture the operator
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past the operator
 	        SyntaxNode rightTerm = parseTermE();  // Parse the right-hand side
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms
 	    }
 
 	    return term;
@@ -394,9 +419,11 @@ public class Parser {
 	    // Handle exponentiation (EXP) between terms (atom EXP atom)
 	    while (currentToken().getType() == TokenType.EXP) {
 	        Token operator = currentToken();  // Capture EXP operator
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        advanceToken();  // Move past EXP
 	        SyntaxNode rightTerm = parseAtom();  // Parse the right-hand side atom
-	        term = new BinaryOpNode(operator.getValue(), term, rightTerm);  // Combine terms with EXP operator
+	        term = new BinaryOpNode(operator.getValue(), term, rightTerm, row, col);  // Combine terms with EXP operator
 	    }
 
 	    return term;
@@ -429,8 +456,10 @@ public class Parser {
 		else if (token.getType() == TokenType.PLUS || token.getType() == TokenType.MINUS || token.getType() == TokenType.NOT) {
 	        Token operator = currentToken();  // Capture the operator
 	        advanceToken();  // Move past the operator
+	        row = currentToken().getRow();
+			col = currentToken().getCol();
 	        SyntaxNode atom = parseAtom();  // Parse the atom (expression)
-	        return new UnaryOpNode(operator.getValue(), atom);  // Create a UnaryOpNode
+	        return new UnaryOpNode(operator.getValue(), atom, row, col);  // Create a UnaryOpNode
 	    }
 		
 		// atom -> LPAREN arithOrStingOrBoolExpr RPAREN
@@ -444,8 +473,10 @@ public class Parser {
 		
 		// atom -> ID
 		else if (token.getType() == TokenType.ID) {
+			row = currentToken().getRow();
+			col = currentToken().getCol();
 			advanceToken();	// Move past ID
-			return new VariableNode(token.getValue());
+			return new VariableNode(token.getValue(), row, col);
 		}
 		
 		// atom -> READINT LPAREN RPAREN

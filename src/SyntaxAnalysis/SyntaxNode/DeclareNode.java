@@ -5,10 +5,13 @@ import java.util.*;
 public class DeclareNode extends SyntaxNode{
 	private String type;	// "int" "bool" "string" "float"
 	public List<SyntaxNode> children;	// Assign or ID
+	public int row, col;	// position of key word(int, bool, string, float)
 
-    public DeclareNode(String type) {
+    public DeclareNode(String type, int row, int col) {
     	this.type = type;
         this.children = new ArrayList<>();
+        this.row = row;
+        this.col = col;
     }
 
     public void add(SyntaxNode node) {

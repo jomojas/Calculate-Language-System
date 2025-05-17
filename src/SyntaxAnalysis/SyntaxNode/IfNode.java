@@ -2,17 +2,22 @@ package SyntaxAnalysis.SyntaxNode;
 
 public class IfNode extends SyntaxNode{
 	public SyntaxNode condition;	// arithOrStringOrBoolExpr
+	public int row, col; 	// position of condition
 	public ExprListNode thenBlock;	// block -> exprList 
 	public ExprListNode elseBlock;	// block -> exprList (can be null)
 	
-	public IfNode(SyntaxNode condition, ExprListNode thenBlock, ExprListNode elseBlock) {
-		this(condition, thenBlock);
+	public IfNode(SyntaxNode condition, ExprListNode thenBlock, ExprListNode elseBlock, int row, int col) {
+		this(condition, thenBlock, row, col);
 		this.elseBlock = elseBlock;
+		this.row = row;
+		this.col = col;
 	}
 	
-	public IfNode(SyntaxNode condition, ExprListNode thenBlock) {
+	public IfNode(SyntaxNode condition, ExprListNode thenBlock, int row, int col) {
 		this.condition = condition;
 		this.thenBlock = thenBlock;
+		this.row = row;
+		this.col = col;
 	}
 	
 	@Override

@@ -55,12 +55,12 @@ public class Interpret {
 			return processDeclareNode(deNode);
 		} else if(node instanceof PrintNode prNode) {
 			return processPrintNode(prNode);
-		} else if(node instanceof SinNode siNode) {
-			return processSinNode(siNode);
-		} else if(node instanceof CosNode coNode) {
-			return processCosNode(coNode);
-		} else if(node instanceof TanNode taNode) {
-			return processTanNode(taNode);
+//		} else if(node instanceof SinNode siNode) {
+//			return processSinNode(siNode);
+//		} else if(node instanceof CosNode coNode) {
+//			return processCosNode(coNode);
+//		} else if(node instanceof TanNode taNode) {
+//			return processTanNode(taNode);
 		} else if(node instanceof ExprListNode exNode) {
 			return processExprListNode(exNode);
 		} else if(node instanceof IfNode ifNode) {
@@ -104,7 +104,7 @@ public class Interpret {
 			} else if(varTypeStack.peek().get(node.variableName) == VariableType.FLOAT && expression instanceof NumberRunResult numRes && !numRes.isInt) {
 				varStack.peek().put(node.variableName, expression);
 			} else {
-				throw new MyException("Mismatched Type: " + expression.getResultType());
+				throw new MyException("Mismatched Type: " + expression.getResultType() + "\trow: " + node.row + "\tcol: " + node.col);
 			}
 		} else {
 			Map<String, RunResult> targetVarScope = findVariableScope(node.variableName);
@@ -122,7 +122,7 @@ public class Interpret {
 			} else if(targetTypeScope.get(node.variableName) == VariableType.FLOAT && expression instanceof NumberRunResult numRes && !numRes.isInt) {
 				targetVarScope.put(node.variableName, expression);
 			} else {
-				throw new MyException("Mismatched Type: " + expression.getResultType());
+				throw new MyException("Mismatched Type: " + expression.getResultType() + "\trow: " + node.row + "\tcol: " + node.col);
 			}
 		}
 		return new VoidRunResult();
@@ -132,7 +132,7 @@ public class Interpret {
 		for(SyntaxNode singleNode : node.children) {
 			if(singleNode instanceof VariableNode snNode) {
 				if(varTypeStack.peek().containsKey(snNode.variableName)) {
-					throw new MyException("Duplicate declaration: " + snNode.variableName);
+					throw new MyException("Duplicate declaration: " + snNode.variableName + "\trow: " + snNode.row + "\tcol: " + snNode.col);
 				}
 				switch (node.getType()) {
 				case "int":
@@ -154,7 +154,7 @@ public class Interpret {
 				}
 			} else if(singleNode instanceof AssignNode asNode) {
 				if(varTypeStack.peek().containsKey(asNode.variableName)) {
-					throw new MyException("Duplicate declaration: " + asNode.variableName);
+					throw new MyException("Duplicate declaration: " + asNode.variableName + "\trow: " + asNode.row + "\tcol: " + asNode.col);
 				}
 				switch (node.getType()) {
 				case "int":
@@ -186,35 +186,35 @@ public class Interpret {
 		return expression;
 	}
 	
-	public RunResult processSinNode(SinNode node) throws MyException {
-		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-		if(expression instanceof NumberRunResult numRes) {			
-			return numRes.sin();
-		}
-		throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType());
-	}
-	
-	public RunResult processCosNode(CosNode node) throws MyException {
-		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-		if(expression instanceof NumberRunResult numRes) {			
-			return numRes.cos();
-		}
-		throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType());
-	}
-	
-	public RunResult processTanNode(TanNode node) throws MyException {
-		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-		if(expression instanceof NumberRunResult numRes) {			
-			return numRes.tan();
-		}
-		throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType());
-	}
+//	public RunResult processSinNode(SinNode node) throws MyException {
+//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
+//		if(expression instanceof NumberRunResult numRes) {			
+//			return numRes.sin();
+//		}
+//		throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType());
+//	}
+//	
+//	public RunResult processCosNode(CosNode node) throws MyException {
+//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
+//		if(expression instanceof NumberRunResult numRes) {			
+//			return numRes.cos();
+//		}
+//		throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType());
+//	}
+//	
+//	public RunResult processTanNode(TanNode node) throws MyException {
+//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
+//		if(expression instanceof NumberRunResult numRes) {			
+//			return numRes.tan();
+//		}
+//		throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType());
+//	}
 	
 	public RunResult processIfNode(IfNode node) throws MyException {
 		enterScope();
 		RunResult condition = processArithOrStringOrBoolExpr(node.condition);
 		if(!(condition instanceof BoolRunResult)) {			
-			throw new MyException("Unsupported Type For IF Condition: " + condition.getResultType());
+			throw new MyException("Unsupported Type For IF Condition: " + condition.getResultType() + "\trow: " + node.row + "\tcol: " + node.col);
 		}
 		BoolRunResult boolRes = (BoolRunResult)condition;
 		// IF Block
@@ -233,7 +233,7 @@ public class Interpret {
 			try {
 				RunResult condition = processArithOrStringOrBoolExpr(node.condition);
 				if(!(condition instanceof BoolRunResult)) {			
-					throw new MyException("Unsupported Type For WHILE Condition: " + condition.getResultType());
+					throw new MyException("Unsupported Type For WHILE Condition: " + condition.getResultType() + "\trow: " + node.row + "\tcol: " + node.col);
 				}
 				BoolRunResult boolRes = (BoolRunResult)condition;
 				if(boolRes.value) {
@@ -256,23 +256,23 @@ public class Interpret {
 		if(node instanceof VariableNode vNode) {
 			Map<String, RunResult> targetScope = findVariableScope(vNode.variableName);
 			if(targetScope == null) {
-				throw new MyException("Undefined Variable: " + vNode.variableName);
+				throw new MyException("Undefined Variable: " + vNode.variableName + "\trow: " + vNode.row + "\tcol: " + vNode.col);
 			}
 			RunResult value = targetScope.get(vNode.variableName);
 			if(value == null) {
-				throw new MyException("Uninitialized variable: " + vNode.variableName);
+				throw new MyException("Uninitialized variable: " + vNode.variableName + "\trow: " + vNode.row + "\tcol: " + vNode.col);
 			}
 			return value;
 		} else if(node instanceof BinaryOpNode bNode) {
 			RunResult left = processArithOrStringOrBoolExpr(bNode.left);
 			RunResult right = processArithOrStringOrBoolExpr(bNode.right);
-			return processBinaryOpNode(bNode.operator, left, right);
+			return processBinaryOpNode(bNode.operator, left, right, bNode.row, bNode.col);
 		} else if(node instanceof UnaryOpNode uNode) {
 			RunResult operand = processArithOrStringOrBoolExpr(uNode.operand);
 			switch (uNode.operator) {
 			case "+":
 				if(!(operand instanceof NumberRunResult)) {					
-					throw new MyException("Unsupported Type For Unary Operator +:" + operand.getResultType());
+					throw new MyException("Unsupported Type For Unary Operator +:" + operand.getResultType() + "\trow: " + uNode.row + "\tcol: " + uNode.col);
 				}
 				if(operand instanceof NumberRunResult numRes) {
 					if(numRes.isInt) {
@@ -284,7 +284,7 @@ public class Interpret {
 				break;
 			case "-":
 				if(!(operand instanceof NumberRunResult)) {					
-					throw new MyException("Unsupported Type For Unary Operator -:" + operand.getResultType());
+					throw new MyException("Unsupported Type For Unary Operator -:" + operand.getResultType() + "\trow: " + uNode.row + "\tcol: " + uNode.col);
 				}
 				if(operand instanceof NumberRunResult numRes) {
 					if(numRes.isInt) {
@@ -296,7 +296,7 @@ public class Interpret {
 				break;
 			case "!":
 				if(!(operand instanceof BoolRunResult)) {					
-					throw new MyException("Unsupported Type For Unary Operator !:" + operand.getResultType());
+					throw new MyException("Unsupported Type For Unary Operator !:" + operand.getResultType() + "\trow: " + uNode.row + "\tcol: " + uNode.col);
 				}
 				if(operand instanceof BoolRunResult boolRes) {
 					if(boolRes.value) {
@@ -307,7 +307,7 @@ public class Interpret {
 				}
 				break;
 			default:
-				throw new MyException("Unknown Unary Operator: " + uNode.operator);
+				throw new MyException("Unknown Unary Operator: " + uNode.operator + "\trow: " + uNode.row + "\tcol: " + (uNode.col - 1));
 			}
 		} else if(node instanceof NumberNode nNode) {
 			if(nNode.isInt()) {
@@ -324,21 +324,21 @@ public class Interpret {
 			if(expression instanceof NumberRunResult numRes) {
 				return numRes.sin();
 			} else {
-				throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType());
+				throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType() + "\trow: " + sinNode.row + "\tcol: " + sinNode.col);
 			}
 		} else if(node instanceof CosNode cosNode) {
 			RunResult expression = processArithOrStringOrBoolExpr(cosNode.expression);
 			if(expression instanceof NumberRunResult numRes) {
 				return numRes.cos();
 			} else {
-				throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType());
+				throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType() + "\trow: " + cosNode.row + "\tcol: " + cosNode.col);
 			}
 		} else if(node instanceof TanNode tanNode) {
 			RunResult expression = processArithOrStringOrBoolExpr(tanNode.expression);
 			if(expression instanceof NumberRunResult numRes) {
 				return numRes.tan();
 			} else {
-				throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType());
+				throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType() + "\trow: " + tanNode.row + "\tcol: " + tanNode.col);
 			}
 		} else if(node instanceof ReadIntNode readIntNode) {
 			return processReadIntNode(readIntNode);
@@ -348,7 +348,7 @@ public class Interpret {
 		return null;
 	}
 	
-	public RunResult processBinaryOpNode(String operator, RunResult left, RunResult right) throws MyException {
+	public RunResult processBinaryOpNode(String operator, RunResult left, RunResult right, int row, int col) throws MyException {
 		switch (operator) {
 		// ARITH(+, -, *, /, %, ^)
 		case "+":
@@ -359,14 +359,14 @@ public class Interpret {
 			} else if(left instanceof BoolRunResult leftRes) {
 				return leftRes.add(right);
 			} else {
-				throw new MyException("Unsupported Type for Addition: " + left.getResultType());
+				throw new MyException("Unsupported Type for Addition: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "-":
 			if(left instanceof NumberRunResult leftRes) {
 				return leftRes.sub(right);
 			} else {
-				throw new MyException("Unsupported Type For Subtraction: " + left.getResultType());
+				throw new MyException("Unsupported Type For Subtraction: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "*":
@@ -375,28 +375,28 @@ public class Interpret {
 			} else if(left instanceof StringRunResult leftRes) {
 				return leftRes.mul(right);
 			} else {
-				throw new MyException("Unsupported Type For Multiplication: " + left.getResultType());
+				throw new MyException("Unsupported Type For Multiplication: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "/":
 			if(left instanceof NumberRunResult leftRes) {
 				return leftRes.div(right);
 			} else {
-				throw new MyException("Unsupported Type For Division: " + left.getResultType());
+				throw new MyException("Unsupported Type For Division: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "%":
 			if(left instanceof NumberRunResult leftRes) {
 				return leftRes.mod(right);
 			} else {
-				throw new MyException("Unsupported Type For Modulo: " + left.getResultType());
+				throw new MyException("Unsupported Type For Modulo: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "^":
 			if(left instanceof NumberRunResult leftRes) {
 				return leftRes.exp(right);
 			} else {
-				throw new MyException("Unsupported Type For Exponent: " + left.getResultType());
+				throw new MyException("Unsupported Type For Exponent: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 			
@@ -410,7 +410,7 @@ public class Interpret {
 					return new BoolRunResult(false);
 				}
 			} else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case ">=":
@@ -422,7 +422,7 @@ public class Interpret {
 					return new BoolRunResult(false);
 				}
 			} else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "<":
@@ -434,7 +434,7 @@ public class Interpret {
 					return new BoolRunResult(false);
 				}
 			} else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "<=":
@@ -446,7 +446,7 @@ public class Interpret {
 					return new BoolRunResult(false);
 				}
 			} else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "==":
@@ -470,7 +470,7 @@ public class Interpret {
 					return new BoolRunResult(false);
 				}
 			} else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "!=":
@@ -495,7 +495,7 @@ public class Interpret {
 				}
 			}
 			else {
-				throw new MyException("Unsupported Type For Comparison: " + left.getResultType());
+				throw new MyException("Unsupported Type For Comparison: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 			
@@ -504,14 +504,14 @@ public class Interpret {
 			if(left instanceof BoolRunResult leftRes) {
 				return leftRes.and(right);
 			} else {
-				throw new MyException("Unsupported Type For Logical Operations: " + left.getResultType());
+				throw new MyException("Unsupported Type For Logical Operations: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		case "|":
 			if(left instanceof BoolRunResult leftRes) {
 				return leftRes.or(right);
 			} else {
-				throw new MyException("Unsupported Type For Logical Operations: " + left.getResultType());
+				throw new MyException("Unsupported Type For Logical Operations: " + left.getResultType() + "\trow: " + row + "\tcol: " + (col - 1));
 			}
 //			break;
 		}
