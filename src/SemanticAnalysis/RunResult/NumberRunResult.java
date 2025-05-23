@@ -154,7 +154,7 @@ public class NumberRunResult extends RunResult {
 	}
 	
 	public NumberRunResult sin() {
-		double result = Math.sin(this.getFloatValue());
+		double result = Math.sin(Math.toRadians(this.getFloatValue()));
         
         if (this.isInt && result == (int)result) {
             return new NumberRunResult((int)result, 0.0, true);
@@ -163,7 +163,7 @@ public class NumberRunResult extends RunResult {
 	}
 	
 	public NumberRunResult cos() {
-        double result = Math.cos(this.getFloatValue());
+        double result = Math.cos(Math.toRadians(this.getFloatValue()));
         if (this.isInt && result == (int)result) {
             return new NumberRunResult((int)result, 0.0, true);
         }
@@ -171,7 +171,7 @@ public class NumberRunResult extends RunResult {
     }
     
     public NumberRunResult tan() {
-        double result = Math.tan(this.getFloatValue());
+        double result = Math.tan(Math.toRadians(this.getFloatValue()));
         if (this.isInt && result == (int)result) {
             return new NumberRunResult((int)result, 0.0, true);
         }

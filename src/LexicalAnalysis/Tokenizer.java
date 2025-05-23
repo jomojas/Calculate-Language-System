@@ -64,7 +64,7 @@ public class Tokenizer {
 	                continue;
 	            }
 
-	            // Handle multi-character operators like >=, <=, ==, !=
+	            // Handle comparison like >=, <=, ==, !=, <, >
 	            if (current == '>' || current == '<' || current == '=' || current == '!') {
 	                tokens.add(scanComparison(rowIndex, lineString));
 	                continue;
@@ -98,7 +98,6 @@ public class Tokenizer {
 	                case '{': tokens.add(new Token(TokenType.LCB, rowIndex, col + 1)); break;
 	                case '}': tokens.add(new Token(TokenType.RCB, rowIndex, col + 1)); break;
 //	                case '=': tokens.add(new Token(TokenType.ASSIGN, "=")); break;
-//	                case '#': tokens.add(new Token(TokenType.DF, "#")); break;
 	                default:
 	                    throw new MyException("Row:" + rowIndex + "	Col:" +	(col + 1) + "Unexpected character: " + current);
 	            }
@@ -178,8 +177,6 @@ public class Tokenizer {
             case "else": return new Token(TokenType.ELSE, rowIndex, col);
             case "while": return new Token(TokenType.WHILE, rowIndex, col);
             case "break": return new Token(TokenType.BREAK, rowIndex, col);
-            case "return": return new Token(TokenType.RETURN, rowIndex, col);
-            case "back": return new Token(TokenType.BACK, rowIndex, col);
             case "continue": return new Token(TokenType.CONTINUE, rowIndex, col);
             case "print": return new Token(TokenType.PRINT, rowIndex, col);
             case "readInt": return new Token(TokenType.READINT, rowIndex, col);
@@ -267,7 +264,8 @@ public class Tokenizer {
 	private void scanSlash(int rowIndex, String currentLine) {
 		char secondChar = currentLine.charAt(pos + 1);
 		if (secondChar != '/') {
-			tokens.add(new Token(TokenType.DIV, rowIndex, col + 1));
+			tokens.add(new Token(TokenType.DIV, rowIndex, col + 1, "/"));
+			pos++;
 		}
 		// Handle comment
 		else {

@@ -89,11 +89,6 @@ public class Parser {
 	        case CONTINUE:
 	            advanceToken();
 	            return new ContinueNode();
-	        case BACK:
-	            advanceToken();
-	            return new BackNode();
-	        case RETURN:
-	            return parseReturn();
 	        case ID:
 	            return parseAssign(false);  // New method: can be assign or expression
 	        default:

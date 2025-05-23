@@ -55,12 +55,6 @@ public class Interpret {
 			return processDeclareNode(deNode);
 		} else if(node instanceof PrintNode prNode) {
 			return processPrintNode(prNode);
-//		} else if(node instanceof SinNode siNode) {
-//			return processSinNode(siNode);
-//		} else if(node instanceof CosNode coNode) {
-//			return processCosNode(coNode);
-//		} else if(node instanceof TanNode taNode) {
-//			return processTanNode(taNode);
 		} else if(node instanceof ExprListNode exNode) {
 			return processExprListNode(exNode);
 		} else if(node instanceof IfNode ifNode) {
@@ -182,33 +176,9 @@ public class Interpret {
 	public RunResult processPrintNode(PrintNode node) throws MyException {
 		RunResult expression = new VoidRunResult();
 		expression = processArithOrStringOrBoolExpr(node.expression);
-		output.append(expression.toString());
+		output.append(expression.toString() + "\n");
 		return expression;
 	}
-	
-//	public RunResult processSinNode(SinNode node) throws MyException {
-//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-//		if(expression instanceof NumberRunResult numRes) {			
-//			return numRes.sin();
-//		}
-//		throw new MyException("Unsupported Type For SIN Calculation: " + expression.getResultType());
-//	}
-//	
-//	public RunResult processCosNode(CosNode node) throws MyException {
-//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-//		if(expression instanceof NumberRunResult numRes) {			
-//			return numRes.cos();
-//		}
-//		throw new MyException("Unsupported Type For COS Calculation: " + expression.getResultType());
-//	}
-//	
-//	public RunResult processTanNode(TanNode node) throws MyException {
-//		RunResult expression = processArithOrStringOrBoolExpr(node.expression);
-//		if(expression instanceof NumberRunResult numRes) {			
-//			return numRes.tan();
-//		}
-//		throw new MyException("Unsupported Type For TAN Calculation: " + expression.getResultType());
-//	}
 	
 	public RunResult processIfNode(IfNode node) throws MyException {
 		enterScope();
@@ -228,9 +198,9 @@ public class Interpret {
 	}
 	
 	public RunResult processWhileNode(WhileNode node) throws MyException {
-		enterScope();
 		while(true) {
 			try {
+				enterScope();
 				RunResult condition = processArithOrStringOrBoolExpr(node.condition);
 				if(!(condition instanceof BoolRunResult)) {			
 					throw new MyException("Unsupported Type For WHILE Condition: " + condition.getResultType() + "\trow: " + node.row + "\tcol: " + node.col);
@@ -241,6 +211,7 @@ public class Interpret {
 				} else {
 					break;
 				}
+				exitScope();
 			} catch (BreakException e) {
 				break;
 			} catch (ContinueException e) {
@@ -248,7 +219,6 @@ public class Interpret {
 			}
 		}
 		
-		exitScope();
 		return new VoidRunResult();
 	}
 	
